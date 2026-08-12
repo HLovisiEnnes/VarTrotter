@@ -1,0 +1,32 @@
+[project]
+name = "vartrotter"
+description = "Variable-weight trotterization algorithm"
+version = "0.0.1"
+authors = [
+    { name = "Henrique Ennes", email = "hlovisiennes@gmail.com" }
+]
+dependencies = [
+    "numpy>=2.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["vartrotter"]
+
+
+[tool.black]
+line-length = 88
+
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "I",    # import sorting
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "SIM",  # simplifications
+]
