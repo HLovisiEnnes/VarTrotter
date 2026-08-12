@@ -4,6 +4,11 @@ Author: Henrique Ennes (https://hlovisiennes.github.io/)
 ----------------------------------------------------------------------------------------
 Utils functions for the Vartrotter package.
 ----------------------------------------------------------------------------------------
+Utils:
+    get_commutator
+    get_commutators_from_list
+    adjoint
+    random_su_d
 """
 
 import numpy as np
@@ -15,20 +20,57 @@ Basic linear algebra
 """
 
 
-def get_commutators(matrices: list[np.ndarray]) -> np.ndarray:
+def get_commutator(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    """
+    Computes the commutator of two matrices A and B.
+
+    Args:
+        A (np.ndarray): First matrix.
+        B (np.ndarray): Second matrix.
+
+    Returns:
+        np.ndarray: The commutator [A, B] = AB - BA.
+    """
+    return A @ B - B @ A
+
+
+def get_commutators_from_list(
+    matrices: list[np.ndarray], indices: bool = False
+) -> np.ndarray:
     """
     Computes the commutators of a list of matrices.
 
     Args:
         matrices (list[np.ndarray]): List of matrices to compute the commutators.
+        indices (bool): If True, yields the indices of the matrices along with the
+            commutator. Default is False.
     Returns:
         np.ndarray: A generator object of commutators of the input matrices.
     """
     # Taking the generators like this avoids repetition of commutators,
     # since [A, B] = -[B, A]
     for i, A in enumerate(matrices):
-        for B in matrices[i + 1 :]:
-            yield A @ B - B @ A
+        for j in range(i + 1, len(matrices)):
+            B = matrices[j]
+
+            if indices:
+                yield i, j, A @ B - B @ A
+            else:
+                yield A @ B - B @ A
+
+
+def adjoint(U: np.ndarray, X: np.ndarray) -> np.ndarray:
+    """
+    Computes the adjoint action of a unitary matrix U on a matrix X.
+
+    Args:
+        U (np.ndarray): Unitary matrix.
+        X (np.ndarray): Matrix to be transformed.
+
+    Returns:
+        np.ndarray: The result of the adjoint action U X U^dagger.
+    """
+    return U @ X @ U.conj().T
 
 
 """
