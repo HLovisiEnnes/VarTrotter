@@ -19,7 +19,12 @@ Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
 
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
 
+# Full controllability
 closed_pulses = Pulses([X, Y, Z])
+
+# Mimics gate synethsis
+small_pulses = [X / 1000, Y / 1000, Z / 1000]
+small_pulses = Pulses(small_pulses)
 
 
 """
@@ -47,6 +52,35 @@ plt.legend()
 plt.xlabel(r"Number of Trotter Steps ($N$)")
 plt.ylabel("Error")
 plt.savefig("figures/errors_fixed_weights_drift_free.pdf")
+plt.show()
+
+
+"""
+Plots the four kinds of estimated errors when we have imperfect synthesis
+"""
+errs_actual = []
+errs_crude = []
+errs_usual = []
+errs_geometric = []
+Ns = list(range(10, 50))
+M = random_su_d(2, seed=seed)
+
+for N in Ns:
+    trotter = FixedWeightTrotterization(small_pulses, N, M, coeffs="Z")
+    errs_actual.append(trotter.compute_actual_error())
+    errs_crude.append(trotter.compute_crude_error_bound())
+    errs_usual.append(trotter.compute_usual_error_bound())
+    errs_geometric.append(trotter.compute_fourier_error_bound())
+
+plt.plot(Ns, errs_actual, "--", c="y", label="Actual Error")
+plt.plot(Ns, errs_crude, c="xkcd:dark orange", label="Crude Bound")
+plt.plot(Ns, errs_usual, c="xkcd:brick red", label="Usual Bound")
+plt.plot(Ns, errs_geometric, c="xkcd:navy", label="Fourier Bound")
+plt.legend()
+plt.xlabel(r"Number of Trotter Steps ($N$)")
+plt.ylabel("Error")
+plt.savefig("figures/errors_fixed_weights_with_drift.pdf")
+plt.show()
 
 """
 Plots the actual error vs the Fourier error bound for a randomly generated Hamiltonians
@@ -82,3 +116,4 @@ plt.plot([0, m], [0, m], "--")
 plt.xlabel("Actual error")
 plt.ylabel("Fourier error")
 plt.savefig("figures/actual_vs_fourier.pdf")
+plt.show()
