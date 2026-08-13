@@ -19,7 +19,7 @@ from vartrotter.utils import (
 def test_get_commutator():
     A = np.array([[0, 1], [-1, 0]], dtype=complex)
     B = np.array([[1, 0], [0, -1]], dtype=complex)
-    expected = A @ B - B @ A
+    expected = 1j * (A @ B - B @ A)
     assert np.array_equal(get_commutator(A, B), expected)
 
 
@@ -29,12 +29,18 @@ def test_get_commutators_from_list():
         np.array([[0, -1j], [1j, 0]], dtype=complex),
         np.array([[1, 0], [0, -1]], dtype=complex),
     ]
+
     expected = [
-        np.array([[2j, 0], [0, -2j]], dtype=complex),
-        np.array([[0, -2], [2, 0]], dtype=complex),
-        np.array([[0, 2j], [2j, 0]], dtype=complex),
+        np.array([[-2, 0], [0, 2]], dtype=complex),
+        np.array([[0, -2j], [2j, 0]], dtype=complex),
+        np.array([[0, -2], [-2, 0]], dtype=complex),
     ]
-    for comm, exp in zip(get_commutators_from_list(matrices), expected):
+
+    commutators = list(get_commutators_from_list(matrices))
+
+    assert len(commutators) == len(expected)
+
+    for comm, exp in zip(commutators, expected):
         np.testing.assert_allclose(comm, exp)
 
 

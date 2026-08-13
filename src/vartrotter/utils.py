@@ -31,7 +31,7 @@ def get_commutator(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: The commutator [A, B] = AB - BA.
     """
-    return A @ B - B @ A
+    return 1j * (A @ B - B @ A)
 
 
 def get_commutators_from_list(
@@ -54,9 +54,9 @@ def get_commutators_from_list(
             B = matrices[j]
 
             if indices:
-                yield i, j, A @ B - B @ A
+                yield i, j, get_commutator(A, B)
             else:
-                yield A @ B - B @ A
+                yield get_commutator(A, B)
 
 
 def adjoint(U: np.ndarray, X: np.ndarray) -> np.ndarray:

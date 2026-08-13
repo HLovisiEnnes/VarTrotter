@@ -49,9 +49,9 @@ def test_getitem(closed_pulses, non_closed_pulses):
 
 def test_commutators(closed_pulses):
     expected = [
-        np.array([[2j, 0], [0, -2j]], dtype=complex),
-        np.array([[0, -2], [2, 0]], dtype=complex),
-        np.array([[0, 2j], [2j, 0]], dtype=complex),
+        np.array([[-2, 0], [0, 2]], dtype=complex),
+        np.array([[0, -2j], [2j, 0]], dtype=complex),
+        np.array([[0, -2], [-2, 0]], dtype=complex),
     ]
 
     for comm, exp in zip(closed_pulses.commutators(), expected):
