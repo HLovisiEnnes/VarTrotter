@@ -46,12 +46,12 @@ for N in Ns:
     errs_crude.append(trotter.compute_crude_error_bound_fixed_weights())
     errs_usual.append(trotter.compute_usual_error_bound_fixed_weights())
     errs_geometric.append(trotter.compute_fourier_error_bound_fixed_weights())
-
-plt.plot(Ns, errs_actual, "--", c="y", label="Actual Error")
+100
 plt.plot(Ns, errs_crude, c="xkcd:dark orange", label="Crude Bound")
 plt.plot(Ns, errs_usual, c="xkcd:brick red", label="Usual Bound")
 plt.plot(Ns, errs_geometric, c="xkcd:navy", label="Fourier Bound")
 plt.legend()
+plt.plot(Ns, errs_actual, "--", c="y", label="Actual Error")
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\varepsilon$")
 plt.savefig("figures/errors_fixed_weights_drift_free.pdf")
@@ -171,7 +171,6 @@ plt.show()
 Plots the variable vs fixed weights error scaling for a randomly generated Hamiltonian
 and integer coefficients, which mimics the case of imperfect synthesis
 """
-
 errs_fixed = []
 errs_var = []
 Ns = list(range(10, 80))
@@ -210,4 +209,32 @@ plt.legend()
 plt.xlabel(r"$\log(N)$")
 plt.ylabel(r"$\log(\varepsilon)$")
 plt.savefig("figures/var_vs_fixed_z.pdf")
+plt.show()
+
+"""
+Get total and relative change of the number of gates
+"""
+gates_fixed = []
+gates_var = []
+Ns = list(range(10, 80))
+
+for N in Ns:
+    trotter = Trotterization(small_pulses, N, M, coeffs="Z")
+    gates_fixed.append(sum(np.abs(trotter.fixed_weights()[0])) * N)
+    gates_var.append(sum(sum(np.abs(trotter.variable_weights()[0]))))
+
+gates_fixed = np.array(gates_fixed)
+gates_var = np.array(gates_var)
+
+plt.plot(Ns, (gates_var - gates_fixed))
+plt.xlabel(r"$N$")
+plt.ylabel("Total change in the number of gates")
+plt.savefig("figures/total_gates.pdf")
+plt.show()
+
+
+plt.plot(Ns, (gates_var - gates_fixed) / gates_fixed)
+plt.xlabel(r"$N$")
+plt.ylabel("Relative change in the number of gates")
+plt.savefig("figures/relative_gates.pdf")
 plt.show()
