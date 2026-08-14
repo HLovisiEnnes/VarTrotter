@@ -15,11 +15,17 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--seed", type=int, default=42)
 parser.add_argument("--n_min", type=int, default=10)
-parser.add_argument("--n_max", type=int, default=50)
+parser.add_argument("--n_max", type=int, default=100)
+parser.add_argument("--norm", type=int, default=50)
+parser.add_argument("--save", type=bool, default=False)
+parser.add_argument("--ext", type=str, default="")
 args = parser.parse_args()
 
 seed = args.seed
 Ns = list(range(args.n_min, args.n_max))
+norm = args.norm
+save = args.save
+file_ext = args.ext
 
 """
 Defines some useful pulses
@@ -34,7 +40,6 @@ Z = np.array([[1, 0], [0, -1]], dtype=complex)
 closed_pulses = Pulses([X, Y, Z])
 
 # Mimics gate synethsis
-norm = 100
 small_pulses = [X / norm, Y / norm, Z / norm]
 small_pulses = Pulses(small_pulses)
 
@@ -56,14 +61,15 @@ for N in Ns:
     errs_usual.append(trotter.compute_usual_error_bound_fixed_weights())
     errs_geometric.append(trotter.compute_fourier_error_bound_fixed_weights())
 
+plt.plot(Ns, errs_actual, "--", c="y", label="Actual Error")
 plt.plot(Ns, errs_crude, c="xkcd:dark orange", label="Crude Bound")
 plt.plot(Ns, errs_usual, c="xkcd:brick red", label="Usual Bound")
 plt.plot(Ns, errs_geometric, c="xkcd:navy", label="Fourier Bound")
 plt.legend()
-plt.plot(Ns, errs_actual, "--", c="y", label="Actual Error")
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\varepsilon$")
-plt.savefig("figures/errors_fixed_weights_drift_free.pdf")
+if save:
+    plt.savefig("figures/errors_fixed_weights_drift_free" + file_ext + ".pdf")
 plt.show()
 
 
@@ -90,7 +96,8 @@ plt.plot(Ns, errs_geometric, c="xkcd:navy", label="Fourier Bound")
 plt.legend()
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\varepsilon$")
-plt.savefig("figures/errors_fixed_weights_with_drift.pdf")
+if save:
+    plt.savefig("figures/errors_fixed_weights_with_drift" + file_ext + ".pdf")
 plt.show()
 
 """
@@ -126,7 +133,8 @@ plt.plot([0, m], [0, m], "--")
 
 plt.xlabel("Actual error")
 plt.ylabel("Fourier error")
-plt.savefig("figures/actual_vs_fourier.pdf")
+if save:
+    plt.savefig("figures/actual_vs_fourier" + file_ext + ".pdf")
 plt.show()
 
 
@@ -169,7 +177,8 @@ plt.legend()
 
 plt.xlabel(r"$\log(N)$")
 plt.ylabel(r"$\log(\epsilon)$")
-plt.savefig("figures/var_vs_fixed_r.pdf")
+if save:
+    plt.savefig("figures/var_vs_fixed_r" + file_ext + ".pdf")
 plt.show()
 
 
@@ -213,7 +222,8 @@ plt.legend()
 
 plt.xlabel(r"$\log(N)$")
 plt.ylabel(r"$\log(\varepsilon)$")
-plt.savefig("figures/var_vs_fixed_z.pdf")
+if save:
+    plt.savefig("figures/var_vs_fixed_z" + file_ext + ".pdf")
 plt.show()
 
 """
@@ -241,7 +251,8 @@ plt.plot(Ns, avg_diff)
 plt.fill_between(Ns, avg_diff - std_div, avg_diff + std_div, alpha=0.2)
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\Delta L$")
-plt.savefig("figures/total_gates_seeds.pdf")
+if save:
+    plt.savefig("figures/total_gates_seeds.pdf")
 plt.show()
 
 """
@@ -261,12 +272,14 @@ gates_var = np.array(gates_var)
 plt.plot(Ns, (gates_var - gates_fixed))
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\Delta L$")
-plt.savefig("figures/total_gates.pdf")
+if save:
+    plt.savefig("figures/total_gates" + file_ext + ".pdf")
 plt.show()
 
 
 plt.plot(Ns, (gates_var - gates_fixed) / gates_fixed)
 plt.xlabel(r"$N$")
 plt.ylabel(r"$\Delta L/L_0$")
-plt.savefig("figures/relative_gates.pdf")
+if save:
+    plt.savefig("figures/relative_gates" + file_ext + ".pdf")
 plt.show()
