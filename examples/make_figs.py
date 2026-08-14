@@ -23,7 +23,8 @@ Z = np.array([[1, 0], [0, -1]], dtype=complex)
 closed_pulses = Pulses([X, Y, Z])
 
 # Mimics gate synethsis
-small_pulses = [X / 1000, Y / 1000, Z / 1000]
+norm = 100
+small_pulses = [X / norm, Y / norm, Z / norm]
 small_pulses = Pulses(small_pulses)
 
 M = random_su_d(2, seed=seed)
