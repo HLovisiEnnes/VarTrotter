@@ -1,3 +1,5 @@
+import argparse
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -6,9 +8,18 @@ from vartrotter.trotterization import Trotterization
 from vartrotter.utils import random_su_d
 
 """
-Defines the seed
+Defines constants
 """
-seed = 42
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--seed", type=int, default=42)
+parser.add_argument("--n_min", type=int, default=10)
+parser.add_argument("--n_max", type=int, default=50)
+args = parser.parse_args()
+
+seed = args.seed
+Ns = list(range(args.n_min, args.n_max))
 
 """
 Defines some useful pulses
@@ -37,8 +48,6 @@ errs_actual = []
 errs_crude = []
 errs_usual = []
 errs_geometric = []
-Ns = list(range(10, 50))
-
 
 for N in Ns:
     trotter = Trotterization(closed_pulses, N, M)
@@ -46,7 +55,7 @@ for N in Ns:
     errs_crude.append(trotter.compute_crude_error_bound_fixed_weights())
     errs_usual.append(trotter.compute_usual_error_bound_fixed_weights())
     errs_geometric.append(trotter.compute_fourier_error_bound_fixed_weights())
-100
+
 plt.plot(Ns, errs_crude, c="xkcd:dark orange", label="Crude Bound")
 plt.plot(Ns, errs_usual, c="xkcd:brick red", label="Usual Bound")
 plt.plot(Ns, errs_geometric, c="xkcd:navy", label="Fourier Bound")
@@ -65,7 +74,6 @@ errs_actual = []
 errs_crude = []
 errs_usual = []
 errs_geometric = []
-Ns = list(range(10, 50))
 
 
 for N in Ns:
@@ -94,13 +102,13 @@ fourier_errors = []
 
 N = 50
 
-for seed in range(100):
-    H = random_su_d(2, seed=seed)
+for s in range(100):
+    H = random_su_d(2, seed=s)
 
-    trot = Trotterization(closed_pulses, N, H)
+    trotter = Trotterization(closed_pulses, N, H)
 
-    actual = trot.compute_actual_error_fixed_weights()
-    fourier = trot.compute_fourier_error_bound_fixed_weights()
+    actual = trotter.compute_actual_error_fixed_weights()
+    fourier = trotter.compute_fourier_error_bound_fixed_weights()
 
     actual_errors.append(actual)
     fourier_errors.append(fourier)
@@ -127,8 +135,6 @@ Plots the variable vs fixed weights error scaling for a randomly generated Hamil
 """
 errs_fixed = []
 errs_var = []
-Ns = list(range(10, 80))
-
 
 for N in Ns:
     trotter = Trotterization(closed_pulses, N, M)
@@ -173,7 +179,6 @@ and integer coefficients, which mimics the case of imperfect synthesis
 """
 errs_fixed = []
 errs_var = []
-Ns = list(range(10, 80))
 
 for N in Ns:
     trotter = Trotterization(small_pulses, N, M, coeffs="Z")
@@ -212,11 +217,38 @@ plt.savefig("figures/var_vs_fixed_z.pdf")
 plt.show()
 
 """
-Get total and relative change of the number of gates
+Get total and relative change of the number of gates as a function of N
+"""
+avg_diff = []
+std_div = []
+
+for N in Ns:
+    cur_diff = []
+    for s in range(30):
+        H = random_su_d(2, seed=s)
+        trotter = Trotterization(small_pulses, N, H, coeffs="Z")
+        cur_diff.append(
+            np.sum(np.abs(trotter.variable_weights()[0]))
+            - sum(np.abs(trotter.fixed_weights()[0])) * N
+        )
+    avg_diff.append(np.mean(cur_diff))
+    std_div.append(np.std(cur_diff))
+
+avg_diff = np.array(avg_diff)
+std_div = np.array(std_div)
+
+plt.plot(Ns, avg_diff)
+plt.fill_between(Ns, avg_diff - std_div, avg_diff + std_div, alpha=0.2)
+plt.xlabel(r"$N$")
+plt.ylabel(r"$\Delta L$")
+plt.savefig("figures/total_gates_seeds.pdf")
+plt.show()
+
+"""
+Get total and relative change of the number of gates for fixed target
 """
 gates_fixed = []
 gates_var = []
-Ns = list(range(10, 80))
 
 for N in Ns:
     trotter = Trotterization(small_pulses, N, M, coeffs="Z")
@@ -228,13 +260,13 @@ gates_var = np.array(gates_var)
 
 plt.plot(Ns, (gates_var - gates_fixed))
 plt.xlabel(r"$N$")
-plt.ylabel("Total change in the number of gates")
+plt.ylabel(r"$\Delta L$")
 plt.savefig("figures/total_gates.pdf")
 plt.show()
 
 
 plt.plot(Ns, (gates_var - gates_fixed) / gates_fixed)
 plt.xlabel(r"$N$")
-plt.ylabel("Relative change in the number of gates")
+plt.ylabel(r"$\Delta L/L_0$")
 plt.savefig("figures/relative_gates.pdf")
 plt.show()
