@@ -126,10 +126,10 @@ fourier_errors = np.array(fourier_errors)
 ratios = np.array(ratios)
 
 # Scatter plot: Fourier prediction vs actual error
-plt.scatter(actual_errors, fourier_errors)
+plt.scatter(actual_errors, fourier_errors, c="xkcd:navy")
 
 m = max(actual_errors.max(), fourier_errors.max())
-plt.plot([0, m], [0, m], "--")
+plt.plot([0, m], [0, m], "--", c="xkcd:navy")
 
 plt.xlabel("Actual error")
 plt.ylabel("Fourier error")
@@ -154,8 +154,12 @@ slope_fixed, _ = np.polyfit(np.log(Ns), np.log(errs_fixed), 1)
 slope_var, _ = np.polyfit(np.log(Ns), np.log(errs_var), 1)
 
 
-plt.loglog(Ns, errs_fixed, label=rf"Fixed weights ($p={slope_fixed:.2f}$)")
-plt.loglog(Ns, errs_var, label=rf"Scheduled weights ($p={slope_var:.2f}$)")
+plt.loglog(
+    Ns, errs_fixed, label=rf"Fixed weights ($p={slope_fixed:.2f}$)", c="xkcd:brick red"
+)
+plt.loglog(
+    Ns, errs_var, label=rf"Scheduled weights ($p={slope_var:.2f}$)", c="xkcd:navy"
+)
 
 
 # Reference scalings
@@ -164,13 +168,11 @@ plt.loglog(
     errs_fixed[0] * (Ns[0] / np.array(Ns)),
     ":",
     label=r"$N^{-1}$",
+    c="xkcd:brick red",
 )
 
 plt.loglog(
-    Ns,
-    errs_var[0] * (Ns[0] / np.array(Ns)) ** 2,
-    ":",
-    label=r"$N^{-2}$",
+    Ns, errs_var[0] * (Ns[0] / np.array(Ns)) ** 2, ":", label=r"$N^{-2}$", c="xkcd:navy"
 )
 
 plt.legend()
@@ -199,8 +201,12 @@ slope_fixed, _ = np.polyfit(np.log(Ns), np.log(errs_fixed), 1)
 slope_var, _ = np.polyfit(np.log(Ns), np.log(errs_var), 1)
 
 
-plt.loglog(Ns, errs_fixed, label=rf"Fixed weights ($p={slope_fixed:.2f}$)")
-plt.loglog(Ns, errs_var, label=rf"Scheduled weights ($p={slope_var:.2f}$)")
+plt.loglog(
+    Ns, errs_fixed, label=rf"Fixed weights ($p={slope_fixed:.2f}$)", c="xkcd:brick red"
+)
+plt.loglog(
+    Ns, errs_var, label=rf"Scheduled weights ($p={slope_var:.2f}$)", c="xkcd:navy"
+)
 
 
 # Reference scalings
@@ -209,6 +215,7 @@ plt.loglog(
     errs_fixed[0] * (Ns[0] / np.array(Ns)),
     ":",
     label=r"$N^{-1}$",
+    c="xkcd:brick red",
 )
 
 plt.loglog(
@@ -216,6 +223,7 @@ plt.loglog(
     errs_var[0] * (Ns[0] / np.array(Ns)) ** 2,
     ":",
     label=r"$N^{-2}$",
+    c="xkcd:navy",
 )
 
 plt.legend()
