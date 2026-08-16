@@ -11,7 +11,7 @@ Utils:
 
 import numpy as np
 
-from .utils import get_commutators_from_list
+from .utils import get_commutators_from_list, real_vec
 
 
 class Pulses:
@@ -55,11 +55,13 @@ class Pulses:
         """
         return get_commutators_from_list(self.pulses_gen, indices=indices)
 
-    def is_subalgebra(self, rtol: float = 1e-6) -> bool:
+    def is_subalgebra(self, atol: float = 1e-10, rtol: float = 1e-6) -> bool:
         """
         Checks if the pulses in the pulses_gen list form a subalgebra of su(d).
 
         Args:
+            atol (float): Absolute tolerance for the linear system solution.
+                Default is 1e-10.
             rtol (float): Relative tolerance for the linear system solution.
                 Default is 1e-6.
 
@@ -67,22 +69,25 @@ class Pulses:
             bool: True if the pulses form a subalgebra, False otherwise.
         """
         # Vectorize the basis
-        basis = np.column_stack([A.reshape(-1) for A in self.pulses_gen])
+        # Real-vectorize the basis, because su(d) is a real vector space.
+        basis = np.column_stack([real_vec(A) for A in self.pulses_gen])
 
         for comm in self.commutators():
-            # Solves the linear system problem to see if the commutator is in the
-            # span of the hermirtian basis.
+            comm_vec = real_vec(comm)
+
+            # Solve over R to check whether the commutator lies in the real span
+            # of the Hermitian basis.
             coeffs, *_ = np.linalg.lstsq(
                 basis,
-                comm.reshape(-1),
+                comm_vec,
                 rcond=None,
             )
 
-            residual = np.linalg.norm(basis @ coeffs - comm.reshape(-1))
+            residual = np.linalg.norm(basis @ coeffs - comm_vec)
 
             # We take the square of the max_norm because the commutator norm is
             # quadratic on the pulses' norms
-            if residual > 2 * rtol * self._max_norm**2:
+            if residual > atol + 2 * rtol * self._max_norm**2:
                 return False
 
         return True

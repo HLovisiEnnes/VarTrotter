@@ -126,10 +126,10 @@ fourier_errors = np.array(fourier_errors)
 ratios = np.array(ratios)
 
 # Scatter plot: Fourier prediction vs actual error
-plt.scatter(actual_errors, fourier_errors, c="xkcd:navy")
+plt.scatter(actual_errors, fourier_errors)
 
 m = max(actual_errors.max(), fourier_errors.max())
-plt.plot([0, m], [0, m], "--", c="xkcd:navy")
+plt.plot([0, m], [0, m], "--")
 
 plt.xlabel("Actual error")
 plt.ylabel("Fourier error")
@@ -201,12 +201,8 @@ slope_fixed, _ = np.polyfit(np.log(Ns), np.log(errs_fixed), 1)
 slope_var, _ = np.polyfit(np.log(Ns), np.log(errs_var), 1)
 
 
-plt.loglog(
-    Ns, errs_fixed, label=rf"Fixed weights ($p={slope_fixed:.2f}$)", c="xkcd:brick red"
-)
-plt.loglog(
-    Ns, errs_var, label=rf"Scheduled weights ($p={slope_var:.2f}$)", c="xkcd:navy"
-)
+plt.loglog(Ns, errs_fixed, label=r"Fixed weights", c="xkcd:brick red")
+plt.loglog(Ns, errs_var, label=r"Scheduled weights", c="xkcd:navy")
 
 
 # Reference scalings

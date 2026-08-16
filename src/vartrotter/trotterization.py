@@ -15,7 +15,7 @@ import numpy as np
 from scipy import linalg
 
 from .pulses import Pulses
-from .utils import adjoint, get_commutators_from_list
+from .utils import adjoint, get_commutators_from_list, real_vec
 
 
 class Trotterization:
@@ -76,9 +76,9 @@ class Trotterization:
 
     def compute_weights(self, H: np.ndarray | None = None) -> np.ndarray:
         """
-        Computes the coefficients for the fixed-weight algorithm by row-reduction.
-        If coefficients are `R`, this are just the output of row-reduction; if they
-        are `Z`, they are rounded to the nearest integer.
+        Computes the coefficients for the fixed-weight algorithm by solving a real
+        linear system. If coefficients are `R`, these are the least-squares
+        coefficients; if they are `Z`, they are rounded to the nearest integer.
 
         Args:
             H (np.ndarray | None): The target matrix. If None, uses the normalized
@@ -87,17 +87,15 @@ class Trotterization:
         Returns:
             np.ndarray: Coefficients for the fixed-weight algorithm.
         """
-        basis = np.column_stack([P.reshape(-1) for P in self.pulses])
         if H is None:
             H = self.norm_target
 
-        H = H.reshape(-1)
+        # Real-vectorize the basis and target, since we want a real linear
+        # combination of Hermitian matrices.
+        basis = np.column_stack([real_vec(P) for P in self.pulses])
+        target = real_vec(H)
 
-        # Solves the system as real, since we want a real linear combination only
-        real_basis = np.vstack([basis.real, basis.imag])
-        real_target = np.concatenate([H.real, H.imag])
-
-        weights, *_ = np.linalg.lstsq(real_basis, real_target, rcond=None)
+        weights, *_ = np.linalg.lstsq(basis, target, rcond=None)
 
         if self.coeffs == "Z":
             weights = np.round(weights)
@@ -254,6 +252,13 @@ class Trotterization:
     """
 
     def compute_schedule(self) -> tuple[list[np.ndarray], np.ndarray]:
+        """
+        Computes the variable-weight schedule and the accumulated drift R.
+
+        Returns:
+            tuple: A tuple containing the schedule of weights and the accumulated
+                drift R.
+        """
         schedule = []
 
         R = np.zeros(self.target.shape, dtype=complex)
@@ -297,6 +302,13 @@ class Trotterization:
         return schedule, R
 
     def variable_weights(self) -> tuple[list[np.ndarray], np.ndarray, dict]:
+        """
+        Computes the variable-weight trotterization solution and the associated errors.
+
+        Returns:
+            tuple: A tuple containing the schedule of weights, the approximate unitary,
+                and a dictionary with the actual error and predicted R_int.
+        """
         schedule, R = self.compute_schedule()
 
         for n, weights in enumerate(schedule):

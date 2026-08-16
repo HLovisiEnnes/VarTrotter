@@ -20,6 +20,17 @@ Basic linear algebra
 """
 
 
+def real_vec(A: np.ndarray) -> np.ndarray:
+    """
+    Real vectorization of a complex matrix.
+
+    This represents complex matrices as real vectors, so that linear systems
+    are solved over R rather than over C.
+    """
+    A = np.asarray(A)
+    return np.concatenate([A.real.reshape(-1), A.imag.reshape(-1)])
+
+
 def get_commutator(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     """
     Computes the commutator of two matrices A and B.
