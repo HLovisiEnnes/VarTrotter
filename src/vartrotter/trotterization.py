@@ -5,7 +5,7 @@ Author: Henrique Ennes (https://hlovisiennes.github.io/)
 The main trotterization class.
 ----------------------------------------------------------------------------------------
 Utils:
-    FixedWeightTrotterization
+    Trotterization
 ----------------------------------------------------------------------------------------
 """
 
@@ -311,14 +311,15 @@ class Trotterization:
         """
         schedule, R = self.compute_schedule()
 
-        for n, weights in enumerate(schedule):
+        appx = np.eye(self.pulses[0].shape[0], dtype=complex)
+
+        for weights in schedule:
             T = np.eye(self.pulses[0].shape[0], dtype=complex)
+
             for i, w in enumerate(weights):
                 T @= linalg.expm(1j * w * self.pulses[i])
-            if n == 0:
-                appx = T
-            else:
-                appx @= T
+
+            appx = T @ appx
 
         actual_err = np.linalg.norm(linalg.expm(1j * self.target) - appx, ord=2)
 
