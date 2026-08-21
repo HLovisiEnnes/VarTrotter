@@ -70,7 +70,7 @@ Clone the repository and install it in editable mode:
 
 ```bash
 # Clone the repository
-git clone https://github.com/HLovisiEnnes/FHDpy/
+git clone https://github.com/HLovisiEnnes/VarTrotter/
 
 # Option 1: Install in editable mode (recommended for development)
 pip install -e .
