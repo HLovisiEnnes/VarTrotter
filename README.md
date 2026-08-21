@@ -36,14 +36,11 @@ $W =\left(\prod_{j=1}^M e^{ic_jH_j}\right)^N.$
 In the variable-weight setting, the coefficients are allowed to depend on the
 Trotter step
 
-$W =T^{(N)}T^{(N-1)}\cdots T^{(1)},\qquad T^{(n)} = \prod_{j=1}^M e^{ic_j^{(n)}H_j}.$
+$W =T^{(N)}T^{(N-1)}\cdots T^{(1)},\qquad T^{(n)} = \prod_{j=1}^M e^{ic_j^{(n)}H_j}$
 
-The schedule
-
-$c^{(1)},\ldots,c^{(N)}$
-
-is chosen adaptively so that the drift introduced at the current step compensates
-for the leading error accumulated at previous steps.
+where the schedule $c^{(1)},\ldots,c^{(N)}$ is chosen adaptively so that the drift
+introduced at the current step compensates for the leading error accumulated at
+previous steps.
 
 From a quantum-control perspective, this corresponds to modifying pulse
 durations/amplitudes while preserving the ordering of the available controls.
